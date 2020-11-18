@@ -80,23 +80,39 @@ viewInput t p v toMsg =
 
 viewValidation : Model -> Html msg
 viewValidation model =
-    if not (containsNumeric model.password) then
-        div [ style "color" "red" ] [ text "Should contain at least 1 NUMERIC character" ]
+    let
+        ( valid, info ) =
+            validate model
 
-    else if not (containsUpperCase model.password) then
-        div [ style "color" "red" ] [ text "Should contain at least UPPER case character" ]
+        color =
+            if valid then
+                "green"
 
-    else if not (containsLowerCase model.password) then
-        div [ style "color" "red" ] [ text "Should contain at least LOWER case character" ]
+            else
+                "red"
+    in
+    div [ style "color" color ] [ text info ]
+
+
+validate : Model -> ( Bool, String )
+validate model =
+    if not (validLength model.password) then
+        ( False, "Should be at least 8 characters LENGTH" )
 
     else if not (model.password == model.passwordAgain) then
-        div [ style "color" "red" ] [ text "Passwords should MATCH" ]
+        ( False, "Passwords should MATCH" )
 
-    else if not (validLength model.password) then
-        div [ style "color" "red" ] [ text "Should be at least 8 characters LENGTH" ]
+    else if not (containsNumeric model.password) then
+        ( False, "Should contain at least 1 NUMERIC character" )
+
+    else if not (containsUpperCase model.password) then
+        ( False, "Should contain at least UPPER case character" )
+
+    else if not (containsLowerCase model.password) then
+        ( False, "Should contain at least LOWER case character" )
 
     else
-        div [ style "color" "green" ] [ text "OK" ]
+        ( True, "OK" )
 
 
 containsNumeric : String -> Bool
@@ -116,4 +132,4 @@ containsLowerCase s =
 
 validLength : String -> Bool
 validLength value =
-    String.length value > 8
+    String.length value >= 8
